@@ -9,6 +9,7 @@ import {
   Container,
   Grid,
   Group,
+  InputLabel,
   Modal,
   MultiSelect,
   NumberInput,
@@ -16,6 +17,7 @@ import {
   Select,
   Stack,
   Table,
+  TableScrollContainer,
   Tabs,
   Text,
   TextInput,
@@ -160,7 +162,7 @@ type FormValues = {
 
 export const HomePage: FC = () => {
   const [opened, { open, close }] = useDisclosure(false)
-  const [friends, setFriends] = useState<string[]>(["โอม", "เฟรชชี่"])
+  const [friends, setFriends] = useState<string[]>(["โอม", "เฟรชชี่", "กฐิน"])
   const [isSaving, setIsSaving] = useState(false)
 
   const addFriendForm = useForm({
@@ -368,7 +370,7 @@ export const HomePage: FC = () => {
             <Grid.Col span={{ base: 12, md: 4 }}>
               <NumberInput
                 classNames={SelectClasses}
-                label='VAT'
+                label='ภาษีมูลค่าเพิ่ม (VAT)'
                 value={NumberInputUtil.valueWithZero(form.values.vatRate * 100)}
                 onBlur={NumberInputUtil.onBlurWithZero(form, "vatRate")}
                 onChange={v =>
@@ -447,70 +449,81 @@ export const HomePage: FC = () => {
               </Button>
             </Group>
             {marginal !== null ? (
-              <Table withTableBorder withColumnBorders striped>
-                <Table.Tbody>
-                  <Table.Tr>
-                    <Table.Td>ค่าไฟส่วนของเครื่องใช้ไฟฟ้า</Table.Td>
-                    <Table.Td align='right'>
-                      {NumberFormatUtil.toBaht(marginal)}
-                    </Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>บิลรวมถ้าไม่มีหน่วยเครื่องใช้ไฟฟ้า</Table.Td>
-                    <Table.Td align='right'>
-                      {NumberFormatUtil.toBaht(
-                        (() => {
-                          if (
-                            form.values.totalKwh === null ||
-                            form.values.acKwh === null
-                          )
-                            return 0
-
-                          const withoutAcBill = calcBillFromUsage(
-                            form.values.totalKwh - form.values.acKwh,
-                            TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
-                            form.values.discount || 0
-                          ).total
-
-                          if (
-                            form.values.allocateServiceProportionally &&
-                            form.values.totalKwh > 0
-                          ) {
-                            const vatRate =
-                              TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.vatRate ??
-                              0.07
-                            const serviceAllocation =
-                              TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.serviceCharge *
-                              (1 + vatRate) *
-                              (form.values.acKwh / form.values.totalKwh)
-                            return withoutAcBill - serviceAllocation
-                          }
-
-                          return withoutAcBill
-                        })()
-                      )}
-                    </Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>
-                      <b>รวมทั้งสิ้น</b>
-                    </Table.Td>
-                    <Table.Td align='right'>
-                      <b>
+              <TableScrollContainer minWidth={400} type='native'>
+                <Table
+                  withTableBorder
+                  withColumnBorders
+                  striped
+                  style={{ tableLayout: "fixed" }}
+                >
+                  <Table.Tbody>
+                    <Table.Tr>
+                      <Table.Td w={150} maw={150}>
+                        ค่าไฟส่วนของเครื่องใช้ไฟฟ้า
+                      </Table.Td>
+                      <Table.Td w={120} maw={120} align='right'>
+                        {NumberFormatUtil.toBaht(marginal)}
+                      </Table.Td>
+                    </Table.Tr>
+                    <Table.Tr>
+                      <Table.Td w={150} maw={150}>
+                        บิลรวมถ้าไม่มีหน่วยเครื่องใช้ไฟฟ้า
+                      </Table.Td>
+                      <Table.Td w={120} maw={120} align='right'>
                         {NumberFormatUtil.toBaht(
-                          form.values.totalKwh !== null
-                            ? calcBillFromUsage(
-                                form.values.totalKwh,
-                                TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
-                                form.values.discount || 0
-                              ).total
-                            : 0
+                          (() => {
+                            if (
+                              form.values.totalKwh === null ||
+                              form.values.acKwh === null
+                            )
+                              return 0
+
+                            const withoutAcBill = calcBillFromUsage(
+                              form.values.totalKwh - form.values.acKwh,
+                              TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+                              form.values.discount || 0
+                            ).total
+
+                            if (
+                              form.values.allocateServiceProportionally &&
+                              form.values.totalKwh > 0
+                            ) {
+                              const vatRate =
+                                TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.vatRate ??
+                                0.07
+                              const serviceAllocation =
+                                TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.serviceCharge *
+                                (1 + vatRate) *
+                                (form.values.acKwh / form.values.totalKwh)
+                              return withoutAcBill - serviceAllocation
+                            }
+
+                            return withoutAcBill
+                          })()
                         )}
-                      </b>
-                    </Table.Td>
-                  </Table.Tr>
-                </Table.Tbody>
-              </Table>
+                      </Table.Td>
+                    </Table.Tr>
+                    <Table.Tr>
+                      <Table.Td w={150} maw={150}>
+                        <b>รวมทั้งสิ้น</b>
+                      </Table.Td>
+                      <Table.Td w={120} maw={120} align='right'>
+                        <b>
+                          {NumberFormatUtil.toBaht(
+                            form.values.totalKwh !== null
+                              ? calcBillFromUsage(
+                                  form.values.totalKwh,
+                                  TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+                                  form.values.discount || 0
+                                ).total
+                              : 0
+                          )}
+                        </b>
+                      </Table.Td>
+                    </Table.Tr>
+                  </Table.Tbody>
+                </Table>
+              </TableScrollContainer>
             ) : (
               <Alert color='red' icon={<IconAlertCircle />}>
                 กรุณาตรวจสอบข้อมูลหน่วยรวม/หน่วยเครื่องใช้ไฟฟ้า
@@ -551,32 +564,45 @@ export const HomePage: FC = () => {
                 const r = proRata
                 if (!r) return null
                 return (
-                  <Table withTableBorder withColumnBorders striped mt='sm'>
-                    <Table.Tbody>
-                      <Table.Tr>
-                        <Table.Td>เฉลี่ยบาท/หน่วย (ก่อน VAT)</Table.Td>
-                        <Table.Td align='right'>
-                          {NumberFormatUtil.toCommaWithMinDecimal(
-                            r.avgBahtPerKWh,
-                            2,
-                            2
-                          )}
-                        </Table.Td>
-                      </Table.Tr>
-                      <Table.Tr>
-                        <Table.Td>ค่าไฟเครื่องใช้ไฟฟ้าก่อน VAT</Table.Td>
-                        <Table.Td align='right'>
-                          {NumberFormatUtil.toBaht(r.acPreVat)}
-                        </Table.Td>
-                      </Table.Tr>
-                      <Table.Tr>
-                        <Table.Td>ค่าไฟเครื่องใช้ไฟฟ้าสุทธิ (รวม VAT)</Table.Td>
-                        <Table.Td align='right'>
-                          <b>{NumberFormatUtil.toBaht(r.acTotal)}</b>
-                        </Table.Td>
-                      </Table.Tr>
-                    </Table.Tbody>
-                  </Table>
+                  <TableScrollContainer minWidth={400} type='native'>
+                    <Table
+                      withTableBorder
+                      withColumnBorders
+                      striped
+                      style={{ tableLayout: "fixed" }}
+                    >
+                      <Table.Tbody>
+                        <Table.Tr>
+                          <Table.Td w={150} maw={150}>
+                            เฉลี่ยบาท/หน่วย (ก่อน VAT)
+                          </Table.Td>
+                          <Table.Td w={120} maw={120} align='right'>
+                            {NumberFormatUtil.toCommaWithMinDecimal(
+                              r.avgBahtPerKWh,
+                              2,
+                              2
+                            )}
+                          </Table.Td>
+                        </Table.Tr>
+                        <Table.Tr>
+                          <Table.Td w={150} maw={150}>
+                            ค่าไฟเครื่องใช้ไฟฟ้าก่อน VAT
+                          </Table.Td>
+                          <Table.Td w={120} maw={120} align='right'>
+                            {NumberFormatUtil.toBaht(r.acPreVat)}
+                          </Table.Td>
+                        </Table.Tr>
+                        <Table.Tr>
+                          <Table.Td w={150} maw={150}>
+                            ค่าไฟเครื่องใช้ไฟฟ้าสุทธิ (รวม VAT)
+                          </Table.Td>
+                          <Table.Td w={120} maw={120} align='right'>
+                            <b>{NumberFormatUtil.toBaht(r.acTotal)}</b>
+                          </Table.Td>
+                        </Table.Tr>
+                      </Table.Tbody>
+                    </Table>
+                  </TableScrollContainer>
                 )
               } catch {
                 return (
@@ -592,6 +618,143 @@ export const HomePage: FC = () => {
     </Tabs>
   )
 
+  const billSummary = (
+    <Paper p='md' radius='sm' withBorder>
+      <Stack>
+        <Title order={6}>สรุปบิลค่าไฟฟ้า</Title>
+        {form.values.totalKwh !== null && (
+          <Paper radius='sm' withBorder style={{ overflow: "hidden" }}>
+            <TableScrollContainer minWidth={400} type='native'>
+              <Table withColumnBorders striped style={{ tableLayout: "fixed" }}>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th w={150} maw={150}>
+                      รายการ
+                    </Table.Th>
+                    <Table.Th w={120} maw={120} align='right'>
+                      จำนวนเงิน (บาท)
+                    </Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ค่าพลังงานไฟฟ้า
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBaht(
+                        energyChargeBySteps(form.values.totalKwh, tariff.steps)
+                      )}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ค่าบริการ
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBaht(tariff.serviceCharge)}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ค่าไฟฟ้าผันแปร Ft ({tariff.ftPerKWh} บาท/หน่วย)
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBaht(
+                        tariff.ftPerKWh * form.values.totalKwh
+                      )}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ส่วนลด
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBaht(form.values.discount || 0)}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      รวมค่าไฟฟ้าก่อนภาษีมูลค่าเพิ่ม
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBaht(
+                        energyChargeBySteps(
+                          form.values.totalKwh,
+                          tariff.steps
+                        ) +
+                          tariff.ftPerKWh * form.values.totalKwh +
+                          tariff.serviceCharge
+                      )}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ภาษีมูลค่าเพิ่ม (VAT) 7%
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBaht(
+                        (energyChargeBySteps(
+                          form.values.totalKwh,
+                          tariff.steps
+                        ) +
+                          tariff.ftPerKWh * form.values.totalKwh +
+                          tariff.serviceCharge) *
+                          (tariff.vatRate ?? 0.07)
+                      )}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      รวมค่าไฟฟ้าเดือนปัจจุบัน
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBaht(
+                        (energyChargeBySteps(
+                          form.values.totalKwh,
+                          tariff.steps
+                        ) +
+                          tariff.ftPerKWh * form.values.totalKwh +
+                          tariff.serviceCharge) *
+                          (1 + (tariff.vatRate ?? 0.07))
+                      )}
+                    </Table.Td>
+                  </Table.Tr>
+                  {form.values.discount && form.values.discount > 0 && (
+                    <Table.Tr>
+                      <Table.Td w={150} maw={150}>
+                        ส่วนลด
+                      </Table.Td>
+                      <Table.Td w={120} maw={120} align='right' c='green'>
+                        -{NumberFormatUtil.toBaht(form.values.discount)}
+                      </Table.Td>
+                    </Table.Tr>
+                  )}
+                  <Table.Tr bg={colors.main[2]}>
+                    <Table.Td w={150} maw={150}>
+                      <b>ยอดรวมสุทธิ</b>
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      <b>
+                        {NumberFormatUtil.toBaht(
+                          calcBillFromUsage(
+                            form.values.totalKwh,
+                            tariff,
+                            form.values.discount || 0
+                          ).total
+                        )}
+                      </b>
+                    </Table.Td>
+                  </Table.Tr>
+                </Table.Tbody>
+              </Table>
+            </TableScrollContainer>
+          </Paper>
+        )}
+      </Stack>
+    </Paper>
+  )
+
   const tariffInfo = (
     <Accordion variant='contained'>
       <Accordion.Item value='tariff-rates'>
@@ -599,165 +762,75 @@ export const HomePage: FC = () => {
           <Title order={6}>อัตราค่าไฟฟ้าที่ใช้ในการคำนวณ</Title>
         </Accordion.Control>
         <Accordion.Panel>
-          <Paper radius='md' withBorder style={{ overflow: "hidden" }}>
-            <Table withColumnBorders striped>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>รายการ</Table.Th>
-                  <Table.Th align='right'>อัตรา/ค่าใช้จ่าย</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                <Table.Tr>
-                  <Table.Td>ขั้นที่ 1 (0-150 หน่วย)</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBahtPerUnit(tariff.steps[0].rate)}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>ขั้นที่ 2 (151-400 หน่วย)</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBahtPerUnit(tariff.steps[1].rate)}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>ขั้นที่ 3 (401 หน่วยขึ้นไป)</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBahtPerUnit(tariff.steps[2].rate)}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>ค่า Ft</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBahtPerUnit(tariff.ftPerKWh)}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>ค่าบริการรายเดือน</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(tariff.serviceCharge)}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>VAT</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toPercentage(tariff.vatRate ?? 0.07)}
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
+          <Paper radius='sm' withBorder style={{ overflow: "hidden" }}>
+            <TableScrollContainer minWidth={400} type='native'>
+              <Table withColumnBorders striped style={{ tableLayout: "fixed" }}>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th w={150} maw={150}>
+                      รายการ
+                    </Table.Th>
+                    <Table.Th w={120} maw={120} align='right'>
+                      อัตรา/ค่าใช้จ่าย
+                    </Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ขั้นที่ 1 (0-150 หน่วย)
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBahtPerUnit(tariff.steps[0].rate)}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ขั้นที่ 2 (151-400 หน่วย)
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBahtPerUnit(tariff.steps[1].rate)}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ขั้นที่ 3 (401 หน่วยขึ้นไป)
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBahtPerUnit(tariff.steps[2].rate)}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ค่าไฟฟ้าผันแปร Ft
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBahtPerUnit(tariff.ftPerKWh)}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ค่าบริการรายเดือน
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toBaht(tariff.serviceCharge)}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td w={150} maw={150}>
+                      ภาษีมูลค่าเพิ่ม (VAT)
+                    </Table.Td>
+                    <Table.Td w={120} maw={120} align='right'>
+                      {NumberFormatUtil.toPercentage(tariff.vatRate ?? 0.07)}
+                    </Table.Td>
+                  </Table.Tr>
+                </Table.Tbody>
+              </Table>
+            </TableScrollContainer>
           </Paper>
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
-  )
-
-  const billSummary = (
-    <Paper p='md' radius='sm' withBorder>
-      <Stack>
-        <Title order={6}>สรุปบิลค่าไฟฟ้า</Title>
-        {form.values.totalKwh !== null && (
-          <Paper radius='md' withBorder style={{ overflow: "hidden" }}>
-            <Table withColumnBorders striped>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>รายการ</Table.Th>
-                  <Table.Th align='right'>จำนวนเงิน (บาท)</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                <Table.Tr>
-                  <Table.Td>ค่าพลังงานไฟฟ้า</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(
-                      energyChargeBySteps(form.values.totalKwh, tariff.steps)
-                    )}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>ค่าบริการ</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(tariff.serviceCharge)}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>
-                    ค่าไฟฟ้าผันแปร Ft ({tariff.ftPerKWh} บาท/หน่วย)
-                  </Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(
-                      tariff.ftPerKWh * form.values.totalKwh
-                    )}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>ส่วนลด</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(form.values.discount || 0)}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>รวมค่าไฟฟ้าก่อนภาษีมูลค่าเพิ่ม</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(
-                      energyChargeBySteps(form.values.totalKwh, tariff.steps) +
-                        tariff.ftPerKWh * form.values.totalKwh +
-                        tariff.serviceCharge
-                    )}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>ภาษีมูลค่าเพิ่ม 7%</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(
-                      (energyChargeBySteps(form.values.totalKwh, tariff.steps) +
-                        tariff.ftPerKWh * form.values.totalKwh +
-                        tariff.serviceCharge) *
-                        (tariff.vatRate ?? 0.07)
-                    )}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>รวมค่าไฟฟ้าเดือนปัจจุบัน</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(
-                      (energyChargeBySteps(form.values.totalKwh, tariff.steps) +
-                        tariff.ftPerKWh * form.values.totalKwh +
-                        tariff.serviceCharge) *
-                        (1 + (tariff.vatRate ?? 0.07))
-                    )}
-                  </Table.Td>
-                </Table.Tr>
-                {form.values.discount && form.values.discount > 0 && (
-                  <Table.Tr>
-                    <Table.Td>ส่วนลด</Table.Td>
-                    <Table.Td align='right' c='green'>
-                      -{NumberFormatUtil.toBaht(form.values.discount)}
-                    </Table.Td>
-                  </Table.Tr>
-                )}
-                <Table.Tr bg={colors.main[2]}>
-                  <Table.Td>
-                    <b>ยอดรวมสุทธิ</b>
-                  </Table.Td>
-                  <Table.Td align='right'>
-                    <b>
-                      {NumberFormatUtil.toBaht(
-                        calcBillFromUsage(
-                          form.values.totalKwh,
-                          tariff,
-                          form.values.discount || 0
-                        ).total
-                      )}
-                    </b>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-          </Paper>
-        )}
-      </Stack>
-    </Paper>
   )
 
   const friendsDivided = (
@@ -775,12 +848,20 @@ export const HomePage: FC = () => {
           value={form.values.appliances_user}
           onChange={v => form.setFieldValue("appliances_user", v)}
         />
-        <Group align='flex-end'>
+        <Stack gap={4}>
+          <Group align='end' gap={6}>
+            <InputLabel fz={12} fw={400}>
+              เพิ่มคนหารค่าไฟฟ้า
+            </InputLabel>
+            <Tooltip label='เพิ่มตัวเลือก' withArrow>
+              <ActionIcon radius={50} size={20} onClick={open}>
+                <IconPlus />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
           <MultiSelect
-            flex={1}
             classNames={SelectClasses}
             data={friends}
-            label='เพิ่มคนหารค่าไฟฟ้า'
             placeholder='เลือก'
             clearable
             nothingFoundMessage='ไม่พบตัวเลือก'
@@ -798,84 +879,87 @@ export const HomePage: FC = () => {
             value={form.values.friends}
             onChange={v => form.setFieldValue("friends", v)}
           />
-          <Tooltip label='เพิ่มตัวเลือก' withArrow>
-            <ActionIcon size={40} onClick={open}>
-              <IconPlus />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
+        </Stack>
 
         <Title order={6}>คำนวณค่าไฟฟ้าต่อคน</Title>
 
         <Paper radius='sm' withBorder style={{ overflow: "hidden" }}>
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>ชื่อผู้ใช้งาน</Table.Th>
-                <Table.Th ta='right'>ค่าไฟฟ้า (บาท)</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {(() => {
-                const selectedFriends = form.values.friends
+          <TableScrollContainer minWidth={400} type='native'>
+            <Table withColumnBorders style={{ tableLayout: "fixed" }}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th w={150} maw={150}>
+                    ชื่อผู้ใช้งาน
+                  </Table.Th>
+                  <Table.Th w={120} maw={120} ta='right'>
+                    ค่าไฟฟ้า (บาท)
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {(() => {
+                  const selectedFriends = form.values.friends
 
-                if (selectedFriends.length === 0) {
-                  return (
-                    <Table.Tr>
-                      <Table.Td colSpan={2} ta='center' c='dimmed'>
-                        <Text fz={12}>กรุณาเลือกคนหารค่าไฟฟ้า</Text>
-                      </Table.Td>
-                    </Table.Tr>
-                  )
-                }
+                  if (selectedFriends.length === 0) {
+                    return (
+                      <Table.Tr>
+                        <Table.Td colSpan={2} ta='center' c='dimmed'>
+                          <Text fz={12}>กรุณาเลือกคนหารค่าไฟฟ้า</Text>
+                        </Table.Td>
+                      </Table.Tr>
+                    )
+                  }
 
-                if (form.values.totalKwh === null) return null
+                  if (form.values.totalKwh === null) return null
 
-                const acCost = marginal || 0
-                const totalBill = calcBillFromUsage(
-                  form.values.totalKwh,
-                  TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
-                  form.values.discount || 0
-                ).total
-                const baseCost = totalBill - acCost
-                const costPerPerson = baseCost / selectedFriends.length
-                const appliancesUser = form.values.appliances_user
+                  const acCost = marginal || 0
+                  const totalBill = calcBillFromUsage(
+                    form.values.totalKwh,
+                    TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+                    form.values.discount || 0
+                  ).total
+                  const baseCost = totalBill - acCost
+                  const costPerPerson = baseCost / selectedFriends.length
+                  const appliancesUser = form.values.appliances_user
 
-                return selectedFriends.map(friend => {
-                  const isAppliancesUser = friend === appliancesUser
-                  const friendCost =
-                    costPerPerson + (isAppliancesUser ? acCost : 0)
+                  return selectedFriends.map(friend => {
+                    const isAppliancesUser = friend === appliancesUser
+                    const friendCost =
+                      costPerPerson + (isAppliancesUser ? acCost : 0)
 
-                  return (
-                    <Table.Tr key={friend}>
-                      <Table.Td>{friend}</Table.Td>
-                      <Table.Td ta='right'>
-                        {NumberFormatUtil.toBaht(friendCost)}
-                      </Table.Td>
-                    </Table.Tr>
-                  )
-                })
-              })()}
-              <Table.Tr bg='var(--table-striped-color)'>
-                <Table.Td>
-                  <b>รวมทั้งสิ้น</b>
-                </Table.Td>
-                <Table.Td ta='right'>
-                  <b>
-                    {NumberFormatUtil.toBaht(
-                      form.values.totalKwh !== null
-                        ? calcBillFromUsage(
-                            form.values.totalKwh,
-                            TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
-                            form.values.discount || 0
-                          ).total
-                        : 0
-                    )}
-                  </b>
-                </Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
-          </Table>
+                    return (
+                      <Table.Tr key={friend}>
+                        <Table.Td w={150} maw={150}>
+                          {friend}
+                        </Table.Td>
+                        <Table.Td w={120} maw={120} ta='right'>
+                          {NumberFormatUtil.toBaht(friendCost)}
+                        </Table.Td>
+                      </Table.Tr>
+                    )
+                  })
+                })()}
+                <Table.Tr bg='var(--table-striped-color)'>
+                  <Table.Td w={150} maw={150}>
+                    <b>รวมทั้งสิ้น</b>
+                  </Table.Td>
+                  <Table.Td w={120} maw={120} ta='right'>
+                    <b>
+                      {NumberFormatUtil.toBaht(
+                        form.values.totalKwh !== null
+                          ? calcBillFromUsage(
+                              form.values.totalKwh,
+                              TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+                              form.values.discount || 0
+                            ).total
+                          : 0
+                      )}
+                    </b>
+                  </Table.Td>
+                </Table.Tr>
+              </Table.Tbody>
+            </Table>
+          </TableScrollContainer>
         </Paper>
       </Stack>
     </Paper>
@@ -883,7 +967,7 @@ export const HomePage: FC = () => {
 
   return (
     <Container size='sm' h='100%'>
-      <Paper id='bill-container' p='24px' radius='md' withBorder>
+      <Paper id='bill-container' p='24px' radius='sm' withBorder>
         <Stack>
           {header}
           {calculatorTabs}
@@ -914,6 +998,17 @@ export const HomePage: FC = () => {
               label='ชื่อเล่น'
               placeholder='ระบุชื่อเล่น'
               {...addFriendForm.getInputProps("name")}
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  setFriends([...friends, addFriendForm.values.name.trim()])
+                  form.insertListItem(
+                    "friends",
+                    addFriendForm.values.name.trim()
+                  )
+                  close()
+                  addFriendForm.reset()
+                }
+              }}
             />
             <Group justify='flex-end'>
               <Button variant='outline' onClick={close}>
@@ -922,8 +1017,14 @@ export const HomePage: FC = () => {
               <Button
                 variant='filled'
                 onClick={() => {
-                  setFriends([...friends, addFriendForm.values.name])
+                  setFriends([...friends, addFriendForm.values.name.trim()])
+                  form.insertListItem(
+                    "friends",
+                    addFriendForm.values.name.trim()
+                  )
+
                   close()
+                  addFriendForm.reset()
                 }}
               >
                 เพิ่ม
