@@ -1009,7 +1009,7 @@ export const HomePage: FC = () => {
             <Button
               onClick={saveBillAsJpeg}
               loading={isSaving}
-              disabled={isSaving}
+              disabled={isSaving || form.values.totalKwh === null}
             >
               {isSaving ? "กำลังสร้างบิล..." : "ดาวน์โหลดบิล"}
             </Button>
