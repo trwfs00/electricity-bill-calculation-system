@@ -363,6 +363,7 @@ export const HomePage: FC = () => {
                 label='ค่าไฟฟ้าผันแปร (Ft)'
                 value={tariff.ftPerKWh}
                 thousandSeparator
+                allowNegative={false}
                 disabled
               />
             </Grid.Col>
@@ -377,6 +378,7 @@ export const HomePage: FC = () => {
                 allowDecimal
                 decimalScale={2}
                 fixedDecimalScale
+                allowNegative={false}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 4 }}>
@@ -388,6 +390,7 @@ export const HomePage: FC = () => {
                 min={0}
                 thousandSeparator
                 allowDecimal={false}
+                allowNegative={false}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 4 }}>
@@ -420,6 +423,7 @@ export const HomePage: FC = () => {
                 allowDecimal
                 decimalScale={2}
                 fixedDecimalScale
+                allowNegative={false}
               />
             </Grid.Col>
           </Grid>
