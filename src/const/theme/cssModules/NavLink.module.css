@@ -1,0 +1,13 @@
+.label {
+  color: var(--mantine-color-black);
+}
+
+.label::before {
+  content: "•";
+  margin-right: 0.75em;
+}
+
+.root {
+  --nl-bg: #f1d9b6;
+  --nl-hover: #f1d9b6;
+}

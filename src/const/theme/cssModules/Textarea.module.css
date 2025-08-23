@@ -1,0 +1,9 @@
+@import "TextInput.module.css";
+
+.input {
+  line-height: 40px;
+  height: unset;
+  &[data-variant="edge"] {
+    height: unset;
+  }
+}

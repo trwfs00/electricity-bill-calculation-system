@@ -1,0 +1,7 @@
+.root {
+  &[data-disabled] {
+    opacity: 0.5;
+    color: var(--button-color);
+    background: var(--button-bg, var(--mantine-primary-color-filled));
+  }
+}

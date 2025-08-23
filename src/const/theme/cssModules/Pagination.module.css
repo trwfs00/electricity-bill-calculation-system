@@ -1,0 +1,44 @@
+.control {
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.control:first-of-type {
+  border: none;
+  border-left: 1px solid var(--mantine-color-gray-3);
+  order: 4;
+  background-color: transparent;
+}
+
+.control:nth-of-type(2),
+.control:nth-of-type(3),
+.control:nth-of-type(4) {
+  order: calc(var(--order) + 1);
+  border: none;
+  border-radius: 8px;
+  margin-right: 6px;
+}
+
+.control:last-of-type {
+  border: none;
+  order: 5;
+  background-color: transparent;
+}
+
+.control:not(:first-of-type):not(:last-of-type):not(:nth-of-type(2)):not(
+    :nth-of-type(3)
+  ):not(:nth-of-type(4)) {
+  border-radius: 8px;
+  margin-right: 6px;
+  border: none;
+}
+
+.control[data-active] {
+  background-color: #f2cfcf;
+  color: var(--mantine-primary-color-filled);
+}
+
+.control[data-disabled] {
+  color: #8a8a8a;
+  opacity: 100%;
+}

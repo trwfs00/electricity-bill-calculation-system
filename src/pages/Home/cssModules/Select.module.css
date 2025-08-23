@@ -1,0 +1,15 @@
+.label {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.input {
+  border-color: #e5e5e5;
+  background-color: #fafafa;
+  font-size: 14px;
+  &[data-disabled="true"] {
+    opacity: 1;
+    color: #4d4d4d;
+    background-color: #e5e5e5;
+  }
+}

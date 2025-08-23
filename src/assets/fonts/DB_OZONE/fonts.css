@@ -1,0 +1,77 @@
+@font-face {
+  font-family: "db_ozone";
+  src: local("db_ozone"),
+    url("./db_ozone_x_li_v3.2-webfont.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "db_ozone";
+  src: local("db_ozone"), url("./db_ozone_x_v3.2-webfont.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "db_ozone";
+  src: local("db_ozone"),
+    url("./db_ozone_x_med_v3.2-webfont.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "db_ozone";
+  src: local("db_ozone"),
+    url("./db_ozone_x_bd_v3.2-webfont.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ปรับขนาดฟอนต์ให้ใหญ่ขึ้นเมื่อเทียบกับฟอนต์อื่น */
+* {
+  font-family: "db_ozone", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+}
+
+/* ปรับขนาดฟอนต์ให้ใหญ่ขึ้นสำหรับทุก element ที่ใช้ db_ozone */
+body,
+html {
+  font-family: "db_ozone", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  font-size-adjust: 0.6; /* ปรับขนาดฟอนต์ให้ใหญ่ขึ้น */
+  text-size-adjust: 120%; /* เพิ่มขนาดข้อความ 20% */
+}
+
+/* ปรับขนาดฟอนต์สำหรับ headings ให้ใหญ่ขึ้น */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "db_ozone", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  font-size-adjust: 0.7; /* ปรับขนาดฟอนต์ให้ใหญ่ขึ้น */
+  text-size-adjust: 130%; /* เพิ่มขนาดข้อความ 30% */
+}
+
+/* ปรับขนาดฟอนต์สำหรับ paragraphs และ text ธรรมดา */
+p,
+span,
+div,
+label,
+input,
+button,
+select,
+textarea {
+  font-family: "db_ozone", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  font-size-adjust: 0.65; /* ปรับขนาดฟอนต์ให้ใหญ่ขึ้น */
+  text-size-adjust: 125%; /* เพิ่มขนาดข้อความ 25% */
+}

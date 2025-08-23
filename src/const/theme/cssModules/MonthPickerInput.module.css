@@ -1,0 +1,5 @@
+@import "TextInput.module.css";
+
+.input {
+  line-height: var(--input-line-height);
+}

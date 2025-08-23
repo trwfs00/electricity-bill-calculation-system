@@ -1,0 +1,50 @@
+.root {
+  &[data-variant="edge"] {
+    position: relative;
+    margin-top: 5px;
+    --input-bd: var(--mantine-color-gray-4);
+    --input-bg: var(--mantine-color-white);
+    --input-bd-focus: var(--mantine-primary-color-filled);
+  }
+}
+
+.label {
+  font-weight: 400;
+  font-size: 14px;
+  &[data-variant="edge"] {
+    position: absolute;
+    top: -12px;
+    left: 8px;
+    z-index: 1;
+    font-size: 1rem;
+  }
+}
+
+/* add a white rectangle that cover input edge */
+.label[data-variant="edge"]::before {
+  position: absolute;
+  content: "";
+  display: block;
+  height: 5px;
+  width: 100%;
+  background-color: white;
+
+  top: 9px;
+  left: 0px;
+  z-index: -1;
+}
+
+.input {
+  line-height: 40px;
+  height: 40px;
+  &[data-variant="edge"] {
+    height: 47px;
+  }
+  /* แก้หัวสระไอหาย ตอนอยู่อักษรแรก*/
+  text-indent: 3px;
+}
+
+/* แก้สระอุแสดงไม่ครบบน placeholder */
+.input::placeholder {
+  height: 40px;
+}

@@ -1,0 +1,28 @@
+.modal_btn_wrapper_left {
+  flex: 1;
+  padding-block: 12px;
+  border-bottom-left-radius: 8px;
+  cursor: pointer;
+}
+
+.modal_btn_wrapper_right {
+  flex: 1;
+  padding-block: 12px;
+  border-bottom-right-radius: 8px;
+  cursor: pointer;
+}
+
+.modal_btn_wrapper_center {
+  flex: 1;
+  border-top: solid 1px #929292;
+  padding-block: 12px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  cursor: pointer;
+}
+
+.modal_btn_wrapper_left:hover,
+.modal_btn_wrapper_right:hover,
+.modal_btn_wrapper_center:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}

@@ -1,0 +1,12 @@
+.root {
+  &[data-disabled] {
+    opacity: 0.5;
+    color: var(--button-color, white);
+    background: var(--button-bg, var(--mantine-primary-color-filled));
+
+    &[data-variant="outline"] {
+      color: var(--button-color, var(--mantine-primary-color-filled));
+      background: var(--button-bg, var(--mantine-color-gray-2));
+    }
+  }
+}
