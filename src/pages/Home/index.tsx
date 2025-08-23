@@ -7,6 +7,7 @@ import {
   Blockquote,
   Button,
   Container,
+  Grid,
   Group,
   Modal,
   MultiSelect,
@@ -23,7 +24,12 @@ import {
 } from "@mantine/core"
 import { MonthPickerInput, type DateValue } from "@mantine/dates"
 import { useForm } from "@mantine/form"
-import { IconAlertCircle, IconCalculator, IconPlus } from "@tabler/icons-react"
+import {
+  IconAlertCircle,
+  IconCalculator,
+  IconPlus,
+  IconSquareRoot2,
+} from "@tabler/icons-react"
 import { toBlob } from "html-to-image"
 import { useMemo, useState, type FC } from "react"
 
@@ -222,13 +228,34 @@ export const HomePage: FC = () => {
       // Wait for any async rendering to complete
       await new Promise(resolve => setTimeout(resolve, 300))
 
+      const bill = billContainer.cloneNode(true) as HTMLElement
+      bill.id = "bill-container-clone"
+      bill.style.width = "600px"
+      bill.style.height = "auto"
+      bill.style.overflow = "hidden"
+      bill.style.margin = "0 auto"
+      bill.style.padding = "20px"
+      bill.style.backgroundColor = "white"
+      bill.style.position = "absolute"
+      bill.style.left = "0"
+      bill.style.top = "0"
+      bill.style.zIndex = "-9999"
+
+      document.body.appendChild(bill)
+
+      const billClone = document.getElementById("bill-container-clone")
+      if (!billClone) {
+        alert("ไม่พบส่วนประกอบบิล")
+        return
+      }
+
       // Generate JPEG using html-to-image with high quality settings
-      const blob = await toBlob(billContainer, {
+      const blob = await toBlob(billClone, {
         quality: 0.95,
         pixelRatio: 2,
         backgroundColor: "white",
-        width: billContainer.scrollWidth,
-        height: billContainer.scrollHeight - 50,
+        width: billClone.scrollWidth,
+        height: billClone.scrollHeight - 50,
         cacheBust: true,
         includeQueryParams: false,
         imagePlaceholder: "",
@@ -243,6 +270,7 @@ export const HomePage: FC = () => {
         },
       })
 
+      document.body.removeChild(billClone)
       if (!blob) {
         throw new Error("Failed to generate image")
       }
@@ -274,82 +302,92 @@ export const HomePage: FC = () => {
 
   const header = (
     <>
-      <Title order={4} mb='md'>
+      <Title order={5} mb='md'>
         ระบบคำนวณค่าไฟฟ้า กฟน.
       </Title>
       <Paper p='md' radius='sm' withBorder>
         <Stack gap='sm'>
           <Title order={6}>ข้อมูลการใช้ไฟฟ้า</Title>
-          <Group grow>
-            <MonthPickerInput
-              classNames={SelectClasses}
-              label='ประจำเดือน'
-              {...form.getInputProps("billDate")}
-              onChange={v => form.setFieldValue("billDate", v)}
-              maxDate={new Date()}
-              clearable
-            />
-            <NumberInput
-              classNames={SelectClasses}
-              label='ค่าบริการ'
-              value={tariff.serviceCharge}
-              thousandSeparator
-              disabled
-            />
-            <NumberInput
-              classNames={SelectClasses}
-              label='ค่าไฟฟ้าผันแปร (Ft)'
-              value={tariff.ftPerKWh}
-              thousandSeparator
-              disabled
-            />
-          </Group>
-          <Group grow>
-            <NumberInput
-              classNames={SelectClasses}
-              label='หน่วยรวมทั้งบ้าน (kWh)'
-              {...form.getInputProps("totalKwh")}
-              onChange={v => form.setFieldValue("totalKwh", Number(v) || 0)}
-              min={0}
-              thousandSeparator
-            />
-            <NumberInput
-              classNames={SelectClasses}
-              label='ส่วนลด'
-              {...form.getInputProps("discount")}
-              onChange={v => form.setFieldValue("discount", Number(v) || 0)}
-              min={0}
-              thousandSeparator
-            />
-            <NumberInput
-              classNames={SelectClasses}
-              label='VAT'
-              value={NumberInputUtil.valueWithZero(form.values.vatRate * 100)}
-              onBlur={NumberInputUtil.onBlurWithZero(form, "vatRate")}
-              onChange={v =>
-                form.setFieldValue("vatRate", Number(v) / 100 || 0)
-              }
-              min={0}
-              max={100}
-              step={1}
-              suffix='%'
-              allowDecimal
-              fixedDecimalScale
-              decimalScale={2}
-              allowNegative={false}
-              disabled
-            />
-          </Group>
-          <Group grow>
-            <NumberInput
-              classNames={SelectClasses}
-              label='หน่วยไฟของเครื่องใช้ไฟฟ้า (kWh)'
-              {...form.getInputProps("acKwh")}
-              onChange={v => form.setFieldValue("acKwh", Number(v) || 0)}
-              min={0}
-              thousandSeparator
-            />
-          </Group>
+          <Grid>
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <MonthPickerInput
+                classNames={SelectClasses}
+                label='ประจำเดือน'
+                {...form.getInputProps("billDate")}
+                onChange={v => form.setFieldValue("billDate", v)}
+                maxDate={new Date()}
+                clearable
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <NumberInput
+                classNames={SelectClasses}
+                label='ค่าบริการ'
+                value={tariff.serviceCharge}
+                thousandSeparator
+                disabled
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <NumberInput
+                classNames={SelectClasses}
+                label='ค่าไฟฟ้าผันแปร (Ft)'
+                value={tariff.ftPerKWh}
+                thousandSeparator
+                disabled
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <NumberInput
+                classNames={SelectClasses}
+                label='หน่วยรวมทั้งบ้าน (kWh)'
+                {...form.getInputProps("totalKwh")}
+                onChange={v => form.setFieldValue("totalKwh", Number(v) || 0)}
+                min={0}
+                thousandSeparator
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <NumberInput
+                classNames={SelectClasses}
+                label='ส่วนลด'
+                {...form.getInputProps("discount")}
+                onChange={v => form.setFieldValue("discount", Number(v) || 0)}
+                min={0}
+                thousandSeparator
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <NumberInput
+                classNames={SelectClasses}
+                label='VAT'
+                value={NumberInputUtil.valueWithZero(form.values.vatRate * 100)}
+                onBlur={NumberInputUtil.onBlurWithZero(form, "vatRate")}
+                onChange={v =>
+                  form.setFieldValue("vatRate", Number(v) / 100 || 0)
+                }
+                min={0}
+                max={100}
+                step={1}
+                suffix='%'
+                allowDecimal
+                fixedDecimalScale
+                decimalScale={2}
+                allowNegative={false}
+                disabled
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <NumberInput
+                classNames={SelectClasses}
+                label='หน่วยไฟของเครื่องใช้ไฟฟ้า (kWh)'
+                {...form.getInputProps("acKwh")}
+                onChange={v => form.setFieldValue("acKwh", Number(v) || 0)}
+                min={0}
+                thousandSeparator
+              />
+            </Grid.Col>
+          </Grid>
         </Stack>
       </Paper>
     </>
@@ -357,114 +395,126 @@ export const HomePage: FC = () => {
 
   const calculatorTabs = (
     <Tabs defaultValue='marginal'>
-      <Tabs.List>
+      <Tabs.List grow style={{ overflowX: "auto" }}>
         <Tabs.Tab value='marginal'>
-          วิธีละเอียด (ขั้นบันได + Ft + ค่าบริการ + VAT)
+          <Group gap='xs' wrap='nowrap'>
+            <IconSquareRoot2 size={24} />
+            <Text fz={14}>คำนวณวิธีละเอียด </Text>
+            <Text fz={10} c='dimmed' component='span'>
+              (ขั้นบันได + Ft + ค่าบริการ + VAT)
+            </Text>
+          </Group>
         </Tabs.Tab>
-        <Tabs.Tab value='proRata' leftSection={<IconCalculator size={24} />}>
-          กะประมาณแบบเฉลี่ย
+        <Tabs.Tab value='proRata'>
+          <Group gap='xs'>
+            <IconCalculator size={24} />
+            <Text fz={14}>คำนวณประมาณแบบเฉลี่ย</Text>
+          </Group>
         </Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value='marginal' pt='md'>
         <Paper p='md' radius='sm' withBorder>
-          <Group gap='sm' mb='xs'>
-            <Button
-              variant={
-                form.values.allocateServiceProportionally ? "filled" : "light"
-              }
-              onClick={() =>
-                form.setFieldValue("allocateServiceProportionally", true)
-              }
+          <Stack>
+            <Group gap='sm' mb='xs'>
+              <Button
+                variant={
+                  form.values.allocateServiceProportionally ? "filled" : "light"
+                }
+                onClick={() =>
+                  form.setFieldValue("allocateServiceProportionally", true)
+                }
+              >
+                จัดสรรค่าบริการตามสัดส่วน
+              </Button>
+              <Button
+                variant={
+                  !form.values.allocateServiceProportionally
+                    ? "filled"
+                    : "light"
+                }
+                onClick={() =>
+                  form.setFieldValue("allocateServiceProportionally", false)
+                }
+              >
+                ไม่จัดสรรค่าบริการ
+              </Button>
+            </Group>
+
+            <Blockquote
+              fz={14}
+              cite='สูตรการคำนวณ'
+              style={{ whiteSpace: "pre-line" }}
             >
-              จัดสรรค่าบริการตามสัดส่วน
-            </Button>
-            <Button
-              variant={
-                !form.values.allocateServiceProportionally ? "filled" : "light"
-              }
-              onClick={() =>
-                form.setFieldValue("allocateServiceProportionally", false)
-              }
-            >
-              ไม่จัดสรรค่าบริการ
-            </Button>
-          </Group>
-
-          {marginal !== null ? (
-            <Table withTableBorder withColumnBorders striped>
-              <Table.Tbody>
-                <Table.Tr>
-                  <Table.Td>ค่าไฟส่วนของเครื่องใช้ไฟฟ้า</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(marginal)}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>บิลรวมถ้าไม่มีหน่วยเครื่องใช้ไฟฟ้า</Table.Td>
-                  <Table.Td align='right'>
-                    {NumberFormatUtil.toBaht(
-                      (() => {
-                        const withoutAcBill = calcBillFromUsage(
-                          form.values.totalKwh - form.values.acKwh,
-                          TARIFF_MEA_RESIDENTIAL_2568_DEFAULT
-                        ).total
-
-                        if (
-                          form.values.allocateServiceProportionally &&
-                          form.values.totalKwh > 0
-                        ) {
-                          const vatRate =
-                            TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.vatRate ?? 0.07
-                          const serviceAllocation =
-                            TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.serviceCharge *
-                            (1 + vatRate) *
-                            (form.values.acKwh / form.values.totalKwh)
-                          return withoutAcBill - serviceAllocation
-                        }
-
-                        return withoutAcBill
-                      })()
-                    )}
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td>
-                    <b>รวมทั้งสิ้น</b>
-                  </Table.Td>
-                  <Table.Td align='right'>
-                    <b>
+              {`ขั้นบันได + Ft + ค่าบริการ + VAT`}
+            </Blockquote>
+            {marginal !== null ? (
+              <Table withTableBorder withColumnBorders striped>
+                <Table.Tbody>
+                  <Table.Tr>
+                    <Table.Td>ค่าไฟส่วนของเครื่องใช้ไฟฟ้า</Table.Td>
+                    <Table.Td align='right'>
+                      {NumberFormatUtil.toBaht(marginal)}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>บิลรวมถ้าไม่มีหน่วยเครื่องใช้ไฟฟ้า</Table.Td>
+                    <Table.Td align='right'>
                       {NumberFormatUtil.toBaht(
-                        calcBillFromUsage(
-                          form.values.totalKwh,
-                          TARIFF_MEA_RESIDENTIAL_2568_DEFAULT
-                        ).total
+                        (() => {
+                          const withoutAcBill = calcBillFromUsage(
+                            form.values.totalKwh - form.values.acKwh,
+                            TARIFF_MEA_RESIDENTIAL_2568_DEFAULT
+                          ).total
+
+                          if (
+                            form.values.allocateServiceProportionally &&
+                            form.values.totalKwh > 0
+                          ) {
+                            const vatRate =
+                              TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.vatRate ??
+                              0.07
+                            const serviceAllocation =
+                              TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.serviceCharge *
+                              (1 + vatRate) *
+                              (form.values.acKwh / form.values.totalKwh)
+                            return withoutAcBill - serviceAllocation
+                          }
+
+                          return withoutAcBill
+                        })()
                       )}
-                    </b>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-          ) : (
-            <Alert color='red' icon={<IconAlertCircle />}>
-              กรุณาตรวจสอบข้อมูลหน่วยรวม/หน่วยเครื่องใช้ไฟฟ้า
-            </Alert>
-          )}
+                    </Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>
+                      <b>รวมทั้งสิ้น</b>
+                    </Table.Td>
+                    <Table.Td align='right'>
+                      <b>
+                        {NumberFormatUtil.toBaht(
+                          calcBillFromUsage(
+                            form.values.totalKwh,
+                            TARIFF_MEA_RESIDENTIAL_2568_DEFAULT
+                          ).total
+                        )}
+                      </b>
+                    </Table.Td>
+                  </Table.Tr>
+                </Table.Tbody>
+              </Table>
+            ) : (
+              <Alert color='red' icon={<IconAlertCircle />}>
+                กรุณาตรวจสอบข้อมูลหน่วยรวม/หน่วยเครื่องใช้ไฟฟ้า
+              </Alert>
+            )}
+          </Stack>
         </Paper>
       </Tabs.Panel>
 
       <Tabs.Panel value='proRata' pt='md'>
         <Paper p='md' radius='lg' withBorder>
           <Stack>
-            <Blockquote
-              fz={16}
-              cite='สูตรการคำนวณ'
-              style={{ whiteSpace: "pre-line" }}
-            >
-              {`ค่าไฟเครื่องใช้ไฟฟ้า ≈ 
-          (ยอดก่อน VAT ÷ หน่วยรวม) × หน่วยเครื่องใช้ไฟฟ้า × (1 + VAT)`}
-            </Blockquote>
-
             <Group grow>
               <NumberInput
                 label='ยอดรวมก่อน VAT (บาท)'
@@ -478,6 +528,15 @@ export const HomePage: FC = () => {
                 fixedDecimalScale
               />
             </Group>
+
+            <Blockquote
+              fz={14}
+              cite='สูตรการคำนวณ'
+              style={{ whiteSpace: "pre-line" }}
+            >
+              {`ค่าไฟเครื่องใช้ไฟฟ้า ≈ 
+          (ยอดก่อน VAT ÷ หน่วยรวม) × หน่วยเครื่องใช้ไฟฟ้า × (1 + VAT)`}
+            </Blockquote>
 
             {(() => {
               try {
@@ -701,7 +760,7 @@ export const HomePage: FC = () => {
   )
 
   return (
-    <Container size='sm'>
+    <Container size='sm' h='100%'>
       <Paper id='bill-container' p='24px' radius='md' withBorder>
         <Stack>
           {header}
