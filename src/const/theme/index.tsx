@@ -51,7 +51,7 @@ export const theme = createTheme({
     "dark-blue": colors.darkBlue,
   },
   primaryColor: "primary",
-  fontFamily: "db_ozone, sans-serif",
+  fontFamily: "var(--font-family)",
   components: {
     LoadingOverlay: LoadingOverlay.extend({
       defaultProps: {

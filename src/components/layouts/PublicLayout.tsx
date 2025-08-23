@@ -1,4 +1,4 @@
-import logo from "@/assets/mea-logo-w.png"
+import logo from "@/assets/my-logo-w.png"
 import { AppShell, Container, Group, Image } from "@mantine/core"
 import type { FC } from "react"
 import { NavLink, Outlet } from "react-router-dom"

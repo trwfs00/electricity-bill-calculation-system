@@ -40,6 +40,8 @@ import { useDisclosure } from "@mantine/hooks"
 import dayjs from "dayjs"
 import SelectClasses from "./cssModules/Select.module.css"
 
+import meaLogo from "@/assets/my-logo.png"
+
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100
 
 type BillSummary = {
@@ -168,6 +170,14 @@ export const HomePage: FC = () => {
   const addFriendForm = useForm({
     initialValues: {
       name: "",
+    },
+    validate: {
+      name: v => {
+        if (v.trim() === "") return "ต้องกรอกชื่อ"
+        if (v.trim().length < 3) return "ต้องมีอย่างน้อย 3 ตัวอักษร"
+        if (friends.includes(v.trim())) return "ชื่อนี้มีอยู่แล้ว"
+        return null
+      },
     },
   })
 
@@ -314,9 +324,15 @@ export const HomePage: FC = () => {
 
   const header = (
     <>
-      <Title order={5} mb='md'>
-        ระบบคำนวณค่าไฟฟ้า กฟน.
-      </Title>
+      <Group justify='space-between'>
+        <img
+          src={meaLogo}
+          alt='logo'
+          height={80}
+          style={{ objectFit: "contain" }}
+        />
+        <Title order={5}>ระบบคำนวณค่าไฟ & หารบิล</Title>
+      </Group>
       <Paper p='md' radius='sm' withBorder>
         <Stack gap='sm'>
           <Title order={6}>ข้อมูลการใช้ไฟฟ้า</Title>
@@ -325,6 +341,7 @@ export const HomePage: FC = () => {
               <MonthPickerInput
                 classNames={SelectClasses}
                 label='ประจำเดือน'
+                placeholder='เลือก'
                 {...form.getInputProps("billDate")}
                 onChange={v => form.setFieldValue("billDate", v)}
                 maxDate={new Date()}
@@ -353,18 +370,24 @@ export const HomePage: FC = () => {
               <NumberInput
                 classNames={SelectClasses}
                 label='หน่วยรวมทั้งบ้าน (kWh)'
+                placeholder='ระบุ'
                 {...form.getInputProps("totalKwh")}
                 min={0}
                 thousandSeparator
+                allowDecimal
+                decimalScale={2}
+                fixedDecimalScale
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 4 }}>
               <NumberInput
                 classNames={SelectClasses}
                 label='ส่วนลด'
+                placeholder='ระบุ'
                 {...form.getInputProps("discount")}
                 min={0}
                 thousandSeparator
+                allowDecimal={false}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 4 }}>
@@ -391,8 +414,12 @@ export const HomePage: FC = () => {
               <NumberInput
                 classNames={SelectClasses}
                 label='หน่วยไฟของเครื่องใช้ไฟฟ้า (kWh)'
+                placeholder='ระบุหน่วยไฟของเครื่องใช้ไฟฟ้า เช่น เครื่องปรับอากาศ'
                 {...form.getInputProps("acKwh")}
                 thousandSeparator
+                allowDecimal
+                decimalScale={2}
+                fixedDecimalScale
               />
             </Grid.Col>
           </Grid>
@@ -851,7 +878,7 @@ export const HomePage: FC = () => {
         <Stack gap={4}>
           <Group align='end' gap={6}>
             <InputLabel fz={12} fw={400}>
-              เพิ่มคนหารค่าไฟฟ้า
+              เพิ่มผู้ใช้งานไฟฟ้า
             </InputLabel>
             <Tooltip label='เพิ่มตัวเลือก' withArrow>
               <ActionIcon radius={50} size={20} onClick={open}>
@@ -889,7 +916,7 @@ export const HomePage: FC = () => {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th w={150} maw={150}>
-                    ชื่อผู้ใช้งาน
+                    ชื่อผู้ใช้งานไฟฟ้า
                   </Table.Th>
                   <Table.Th w={120} maw={120} ta='right'>
                     ค่าไฟฟ้า (บาท)
@@ -987,7 +1014,7 @@ export const HomePage: FC = () => {
       </Paper>
       {opened && (
         <Modal
-          title={<Title order={6}>เพิ่มตัวเลือกคนหารค่าไฟฟ้า</Title>}
+          title={<Title order={6}>เพิ่มตัวเลือกผู้ใช้งานไฟฟ้า</Title>}
           opened={opened}
           onClose={close}
           centered
@@ -1000,6 +1027,8 @@ export const HomePage: FC = () => {
               {...addFriendForm.getInputProps("name")}
               onKeyDown={e => {
                 if (e.key === "Enter") {
+                  if (addFriendForm.validate().hasErrors) return
+
                   setFriends([...friends, addFriendForm.values.name.trim()])
                   form.insertListItem(
                     "friends",
@@ -1017,6 +1046,8 @@ export const HomePage: FC = () => {
               <Button
                 variant='filled'
                 onClick={() => {
+                  if (addFriendForm.validate().hasErrors) return
+
                   setFriends([...friends, addFriendForm.values.name.trim()])
                   form.insertListItem(
                     "friends",
