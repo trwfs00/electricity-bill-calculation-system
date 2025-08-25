@@ -80,7 +80,7 @@ electricity-bill-calculation-system/
 │   ├── const/              # Constants and configuration
 │   │   └── theme/          # Theme configuration
 │   ├── assets/             # Static assets
-│   │   └── fonts/          # Custom fonts (DB Ozone)
+│   │   └── fonts/          # Custom fonts (IBM Plex Sans Thai)
 │   └── router/             # Application routing
 ├── public/                 # Public assets
 ├── package.json            # Dependencies and scripts
@@ -171,7 +171,7 @@ const TARIFF_MEA_RESIDENTIAL_2568_DEFAULT: Tariff = {
 
 ### **Custom Styling**
 
-- **DB Ozone Font** - Custom Thai font integration
+- **IBM Plex Sans Thai** - Custom Thai font integration
 - **Color Scheme** - Consistent color palette
 - **Responsive Design** - Mobile-first approach
 
@@ -234,7 +234,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **MEA/PEA** - For electricity tariff information
 - **Mantine** - For the excellent UI component library
-- **DB Ozone Font** - For beautiful Thai typography
+- **IBM Plex Sans Thai** - For beautiful Thai typography
 
 ## 📞 Support
 
