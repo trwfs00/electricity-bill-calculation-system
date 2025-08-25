@@ -25,7 +25,7 @@ A modern web application for calculating electricity bills with advanced feature
 
 - **Modern React** - Built with React 18 and TypeScript
 - **Mantine UI** - Beautiful, accessible component library
-- **Custom Fonts** - DB Ozone font integration
+- **Custom Fonts** - IBM Plex Sans Thai font integration
 - **Form Validation** - Comprehensive input validation
 - **Error Handling** - User-friendly error messages
 
