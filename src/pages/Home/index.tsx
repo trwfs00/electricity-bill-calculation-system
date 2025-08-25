@@ -252,7 +252,7 @@ export const HomePage: FC = () => {
 
       const bill = billContainer.cloneNode(true) as HTMLElement
       bill.id = "bill-container-clone"
-      bill.style.width = "600px"
+      bill.style.width = "640px"
       bill.style.height = "auto"
       bill.style.overflow = "hidden"
       bill.style.margin = "0 auto"
