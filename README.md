@@ -25,7 +25,7 @@ A modern web application for calculating electricity bills with advanced feature
 
 - **Modern React** - Built with React 18 and TypeScript
 - **Mantine UI** - Beautiful, accessible component library
-- **Custom Fonts** - DB Ozone font integration
+- **Custom Fonts** - IBM Plex Sans Thai font integration
 - **Form Validation** - Comprehensive input validation
 - **Error Handling** - User-friendly error messages
 
@@ -80,7 +80,7 @@ electricity-bill-calculation-system/
 │   ├── const/              # Constants and configuration
 │   │   └── theme/          # Theme configuration
 │   ├── assets/             # Static assets
-│   │   └── fonts/          # Custom fonts (DB Ozone)
+│   │   └── fonts/          # Custom fonts (IBM Plex Sans Thai)
 │   └── router/             # Application routing
 ├── public/                 # Public assets
 ├── package.json            # Dependencies and scripts
@@ -171,7 +171,7 @@ const TARIFF_MEA_RESIDENTIAL_2568_DEFAULT: Tariff = {
 
 ### **Custom Styling**
 
-- **DB Ozone Font** - Custom Thai font integration
+- **IBM Plex Sans Thai** - Custom Thai font integration
 - **Color Scheme** - Consistent color palette
 - **Responsive Design** - Mobile-first approach
 
@@ -234,7 +234,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **MEA/PEA** - For electricity tariff information
 - **Mantine** - For the excellent UI component library
-- **DB Ozone Font** - For beautiful Thai typography
+- **IBM Plex Sans Thai** - For beautiful Thai typography
 
 ## 📞 Support
 
@@ -246,4 +246,4 @@ If you encounter any issues or have questions:
 
 ---
 
-**Made with ⚡ by [Your Name]**
+**Made with ⚡ by trwfs00**
