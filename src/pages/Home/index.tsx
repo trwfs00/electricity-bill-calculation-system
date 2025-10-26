@@ -4,6 +4,7 @@ import {
   Accordion,
   ActionIcon,
   Alert,
+  Anchor,
   Blockquote,
   Button,
   Container,
@@ -29,6 +30,7 @@ import { useForm } from "@mantine/form"
 import {
   IconAlertCircle,
   IconCalculator,
+  IconInfoCircleFilled,
   IconPlus,
   IconSquareRoot2,
 } from "@tabler/icons-react"
@@ -61,7 +63,8 @@ type Tariff = {
 
 // ---------------- Hidden Tariff Profile ----------------
 // แก้ประกาศที่นี่เท่านั้น ไม่แสดงบน UI
-// ตัวเลขตัวอย่างอิงจากเอกสาร MEA/PEA (ดูใบประกาศ) และบิลตัวอย่าง: Ft=0.1972, Service=24.62, VAT=7%
+// ตัวเลขตัวอย่างอิงจากเอกสาร MEA/PEA (ดูใบประกาศ) และบิลตัวอย่าง: Ft=0.1572, Service=24.62, VAT=7%
+// อ้างอิงจาก: https://www.mea.or.th/our-services/tariff-calculation/latestft
 // หมายเหตุ: ช่วงบล็อกอัตราที่อยู่อาศัยจะเปลี่ยนขึ้นกับเงื่อนไข 1.1/1.2 ของการไฟฟ้า โปรไฟล์นี้ตั้งให้ครอบคลุมกรณีใช้เกิน 150 หน่วย/เดือน
 const TARIFF_MEA_RESIDENTIAL_2568_DEFAULT: Tariff = {
   steps: [
@@ -70,7 +73,7 @@ const TARIFF_MEA_RESIDENTIAL_2568_DEFAULT: Tariff = {
     { upto: 400, rate: 4.2218 },
     { upto: null, rate: 4.4217 },
   ],
-  ftPerKWh: 0.1972,
+  ftPerKWh: 0.1572,
   serviceCharge: 24.62,
   vatRate: 0.07,
 }
@@ -160,6 +163,8 @@ type FormValues = {
   allocateServiceProportionally: boolean
   appliances_user: string | null
   friends: string[]
+  ftPerKWh: number // ค่าไฟฟ้าผันแปร (Ft)
+  serviceCharge: number // ค่าบริการ
 }
 
 export const HomePage: FC = () => {
@@ -193,6 +198,8 @@ export const HomePage: FC = () => {
       allocateServiceProportionally: true,
       appliances_user: "เฟรชชี่",
       friends: [],
+      ftPerKWh: TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.ftPerKWh,
+      serviceCharge: TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.serviceCharge,
     },
     validate: {
       totalKwh: v => (v === null || v <= 0 ? "ต้องมากกว่า 0" : null),
@@ -204,10 +211,20 @@ export const HomePage: FC = () => {
       },
       vatRate: v => (v < 0 || v > 1 ? "0..1" : null),
       preVatAmount: v => (v < 0 ? "ต้องไม่ติดลบ" : null),
+      ftPerKWh: v => (v < 0 ? "ต้องไม่ติดลบ" : null),
+      serviceCharge: v => (v < 0 ? "ต้องไม่ติดลบ" : null),
     },
   })
 
-  const tariff = TARIFF_MEA_RESIDENTIAL_2568_DEFAULT
+  // Create dynamic tariff based on form values
+  const tariff = useMemo(
+    () => ({
+      ...TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+      ftPerKWh: form.values.ftPerKWh,
+      serviceCharge: form.values.serviceCharge,
+    }),
+    [form.values.ftPerKWh, form.values.serviceCharge]
+  )
 
   const proRata = useMemo(() => {
     try {
@@ -234,7 +251,7 @@ export const HomePage: FC = () => {
     } catch {
       return null
     }
-  }, [form.values])
+  }, [form.values, tariff])
 
   const saveBillAsJpeg = async () => {
     if (isSaving) return
@@ -303,10 +320,7 @@ export const HomePage: FC = () => {
 
       // Generate filename with Thai month
       const billDate = form.values.billDate
-      const dateString =
-        billDate instanceof Date
-          ? dayjs(billDate).format("MMMM_BBBB")
-          : "ไม่ระบุเดือน"
+      const dateString = dayjs(billDate).format("MMMM_BBBB")
       link.download = `บิลค่าไฟฟ้า_${dateString}.jpg`
 
       // Trigger download
@@ -352,19 +366,34 @@ export const HomePage: FC = () => {
               <NumberInput
                 classNames={SelectClasses}
                 label='ค่าบริการ'
-                value={tariff.serviceCharge}
+                placeholder='ระบุ'
+                {...form.getInputProps("serviceCharge")}
+                min={0}
                 thousandSeparator
-                disabled
+                allowDecimal
+                decimalScale={2}
+                fixedDecimalScale
+                allowNegative={false}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 4 }}>
               <NumberInput
                 classNames={SelectClasses}
                 label='ค่าไฟฟ้าผันแปร (Ft)'
-                value={tariff.ftPerKWh}
+                placeholder='ระบุ'
+                {...form.getInputProps("ftPerKWh")}
+                min={0}
                 thousandSeparator
+                allowDecimal
+                decimalScale={4}
+                fixedDecimalScale
                 allowNegative={false}
-                disabled
+                rightSectionWidth={36}
+                rightSection={
+                  <Tooltip label='อัปเดตล่าสุด 5 ส.ค. 2568 อ้างอิงจาก MEA'>
+                    <IconInfoCircleFilled size={20} />
+                  </Tooltip>
+                }
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 4 }}>
@@ -511,7 +540,7 @@ export const HomePage: FC = () => {
 
                             const withoutAcBill = calcBillFromUsage(
                               form.values.totalKwh - form.values.acKwh,
-                              TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+                              tariff,
                               form.values.discount || 0
                             ).total
 
@@ -519,11 +548,9 @@ export const HomePage: FC = () => {
                               form.values.allocateServiceProportionally &&
                               form.values.totalKwh > 0
                             ) {
-                              const vatRate =
-                                TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.vatRate ??
-                                0.07
+                              const vatRate = tariff.vatRate ?? 0.07
                               const serviceAllocation =
-                                TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.serviceCharge *
+                                tariff.serviceCharge *
                                 (1 + vatRate) *
                                 (form.values.acKwh / form.values.totalKwh)
                               return withoutAcBill - serviceAllocation
@@ -544,7 +571,7 @@ export const HomePage: FC = () => {
                             form.values.totalKwh !== null
                               ? calcBillFromUsage(
                                   form.values.totalKwh,
-                                  TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+                                  tariff,
                                   form.values.discount || 0
                                 ).total
                               : 0
@@ -859,6 +886,18 @@ export const HomePage: FC = () => {
               </Table>
             </TableScrollContainer>
           </Paper>
+          <Text fz={14} c='dimmed' mt='xs'>
+            อ้างอิงค่าไฟฟ้าผันแปร (Ft) จาก:{" "}
+            <Anchor
+              fz={14}
+              href='https://www.mea.or.th/our-services/tariff-calculation/latestft'
+              target='_blank'
+              c='blue'
+              underline='always'
+            >
+              การไฟฟ้านครหลวง (MEA)
+            </Anchor>
+          </Text>
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
@@ -946,7 +985,7 @@ export const HomePage: FC = () => {
                   const acCost = marginal || 0
                   const totalBill = calcBillFromUsage(
                     form.values.totalKwh,
-                    TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+                    tariff,
                     form.values.discount || 0
                   ).total
                   const baseCost = totalBill - acCost
@@ -980,7 +1019,7 @@ export const HomePage: FC = () => {
                         form.values.totalKwh !== null
                           ? calcBillFromUsage(
                               form.values.totalKwh,
-                              TARIFF_MEA_RESIDENTIAL_2568_DEFAULT,
+                              tariff,
                               form.values.discount || 0
                             ).total
                           : 0
