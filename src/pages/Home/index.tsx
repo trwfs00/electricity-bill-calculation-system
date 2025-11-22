@@ -15,7 +15,6 @@ import {
   MultiSelect,
   NumberInput,
   Paper,
-  Select,
   Stack,
   Table,
   TableScrollContainer,
@@ -161,7 +160,7 @@ type FormValues = {
   discount: number | null
   acKwh: number | null
   allocateServiceProportionally: boolean
-  appliances_user: string | null
+  appliances_user: string[] // Changed to array for multiple users
   friends: string[]
   ftPerKWh: number // ค่าไฟฟ้าผันแปร (Ft)
   serviceCharge: number // ค่าบริการ
@@ -196,7 +195,7 @@ export const HomePage: FC = () => {
       discount: null,
       acKwh: null,
       allocateServiceProportionally: true,
-      appliances_user: "เฟรชชี่",
+      appliances_user: [],
       friends: [],
       ftPerKWh: TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.ftPerKWh,
       serviceCharge: TARIFF_MEA_RESIDENTIAL_2568_DEFAULT.serviceCharge,
@@ -908,13 +907,24 @@ export const HomePage: FC = () => {
       <Stack>
         <Title order={6}>หารค่าไฟฟ้ากับเพื่อน</Title>
 
-        <Select
+        <MultiSelect
           classNames={SelectClasses}
           data={friends}
           label='ผู้ใช้งานเครื่องใช้ไฟฟ้า'
           placeholder='เลือก'
           clearable
           nothingFoundMessage='ไม่พบตัวเลือก'
+          searchable
+          styles={{
+            input: {
+              minHeight: 40,
+              height: "auto",
+            },
+            pill: {
+              backgroundColor: colors.main[2],
+              borderRadius: 4,
+            },
+          }}
           value={form.values.appliances_user}
           onChange={v => form.setFieldValue("appliances_user", v)}
         />
@@ -990,12 +1000,17 @@ export const HomePage: FC = () => {
                   ).total
                   const baseCost = totalBill - acCost
                   const costPerPerson = baseCost / selectedFriends.length
-                  const appliancesUser = form.values.appliances_user
+                  const appliancesUsers = form.values.appliances_user
+                  const acCostPerApplianceUser =
+                    appliancesUsers.length > 0
+                      ? acCost / appliancesUsers.length
+                      : 0
 
                   return selectedFriends.map(friend => {
-                    const isAppliancesUser = friend === appliancesUser
+                    const isAppliancesUser = appliancesUsers.includes(friend)
                     const friendCost =
-                      costPerPerson + (isAppliancesUser ? acCost : 0)
+                      costPerPerson +
+                      (isAppliancesUser ? acCostPerApplianceUser : 0)
 
                     return (
                       <Table.Tr key={friend}>
