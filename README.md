@@ -7,6 +7,7 @@ A modern web application for calculating electricity bills with advanced feature
 ### **Core Functionality**
 
 - **Electricity Bill Calculator** - Calculate costs using MEA residential tariff structures
+- **Shared Bill Calculator** - Split MWA water bills and other household expenses such as internet, rent, and shared fees
 - **Two Calculation Methods**:
   - **Marginal Method** - Detailed calculation with step rates, Ft charges, and service fees
   - **Pro-rata Method** - Simple average cost per unit calculation
@@ -73,7 +74,8 @@ electricity-bill-calculation-system/
 ├── src/
 │   ├── components/          # Reusable UI components
 │   ├── pages/              # Page components
-│   │   └── Home/           # Main calculator page
+│   │   ├── Home/           # Main electricity calculator page
+│   │   └── SharedBill/     # Water and other shared bill calculator
 │   ├── utils/              # Utility functions
 │   │   ├── NumberFormatUtil.ts    # Number formatting utilities
 │   │   └── NumberInputUtil.ts     # Input handling utilities
