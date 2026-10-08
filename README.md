@@ -6,7 +6,7 @@ A modern web application for calculating electricity bills with advanced feature
 
 ### **Core Functionality**
 
-- **Electricity Bill Calculator** - Calculate costs using MEA/PEA tariff structures
+- **Electricity Bill Calculator** - Calculate costs using MEA residential tariff structures
 - **Two Calculation Methods**:
   - **Marginal Method** - Detailed calculation with step rates, Ft charges, and service fees
   - **Pro-rata Method** - Simple average cost per unit calculation
@@ -133,30 +133,16 @@ electricity-bill-calculation-system/
    - Automatic download with Thai month naming
    - High-quality image suitable for printing/sharing
 
-## ⚙️ Configuration
+## ⚙️ MEA Residential Tariffs
 
-### **Tariff Settings**
-
-The system uses MEA residential tariff structure (2568) by default:
-
-```typescript
-const TARIFF_MEA_RESIDENTIAL_2568_DEFAULT: Tariff = {
-  steps: [
-    { upto: 150, rate: 3.2484 }, // 0-150 units
-    { upto: 400, rate: 4.2218 }, // 151-400 units
-    { upto: null, rate: 4.4217 }, // 401+ units
-  ],
-  ftPerKWh: 0.1972, // Ft charge per unit
-  serviceCharge: 24.62, // Monthly service fee
-  vatRate: 0.07, // VAT rate (7%)
-}
-```
-
-### **Customization**
-
-- Modify tariff rates in `src/pages/Home/index.tsx`
-- Adjust VAT rates and service charges
-- Customize calculation methods
+The calculator supports ordinary residential MEA categories 1.1 and 1.2,
+including the rate change from the September 2569 bill, monthly service charges,
+and the verified Ft periods from September 2568 through December 2569. The
+category is selected from the MEA bill, since meter size and recent usage history
+can affect the assigned category. VAT is 7%. Users can edit Ft and service
+charge to match a specific bill. Tariff data and its official MEA references are
+in `src/utils/ElectricityBill.ts`; the researched rates and category rules are
+documented in `docs/electricity-tariffs-2026-10.md`.
 
 ## 🎨 UI Components
 
@@ -232,7 +218,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **MEA/PEA** - For electricity tariff information
+- **MEA** - For official residential electricity tariff information
 - **Mantine** - For the excellent UI component library
 - **IBM Plex Sans Thai** - For beautiful Thai typography
 
